@@ -14,13 +14,17 @@ NSTextView *findAndFocusFirstTextViewIn(NSView *view) {
 	unsigned int subviewCount = [subviews count];
 	NSTextView *textView      = nil;
 
-	for (unsigned int index = 0; index < subviewCount; index += 1) {
+	for(unsigned int index = 0; index < subviewCount; index += 1)
+	{
 		NSView *subview = [subviews objectAtIndex:index];
-		if ([subview isKindOfClass:[NSTextView class]]) {
+		if([subview isKindOfClass:[NSTextView class]])
+		{
 			// [[subview window] performSelector:@selector(makeFirstResponder:) withObject:subview afterDelay:0.0];
 			// [[subview window] makeFirstResponder:subview];
 			return (NSTextView *)subview;
-		} else if (textView = findAndFocusFirstTextViewIn(subview)) {
+		}
+		else if(textView = findAndFocusFirstTextViewIn(subview))
+		{
 			return textView;
 		}
 	}
@@ -38,7 +42,8 @@ NSTextView *findAndFocusFirstTextViewIn(NSView *view) {
 // (regardless of scope) when inside the bundle editor
 - (void)swizzledShowKeyEquivalent:(NSEvent *)keyEquivalent withResults:(NSArray *)results
 {
-	if ([self isInBundleEditor]) {
+	if([self isInBundleEditor])
+	{
 		// First we call the standard method to display the key equivalent in the search field
 		// Because the scope filter is empty, this method will only show bundle items
 		// which are completely unscoped
@@ -48,7 +53,9 @@ NSTextView *findAndFocusFirstTextViewIn(NSView *view) {
 		// and tell the tableview to reload itself
 		[self setValue:results forKey:@"bundleItems"];
 		[[[self valueForKey:@"bundleItemsTableColumn"] tableView] reloadData];
-	} else {
+	}
+	else
+	{
 		[self swizzledShowKeyEquivalent:keyEquivalent withResults:results];
 	}
 }
@@ -63,7 +70,8 @@ NSTextView *findAndFocusFirstTextViewIn(NSView *view) {
 	// Call the standard method to get the normal results
 	[self swizzledSearch:search];
 
-	if ([self isInBundleEditor] && searchString && [searchString length] > 0 && isNewSearch) {
+	if([self isInBundleEditor] && searchString && [searchString length] > 0 && isNewSearch)
+	{
 		// languages is an array of NSDictionaries with the language plists
 		NSArray *languages         = [[NSClassFromString(@"BundleManager") sharedInstance] languages];
 		NSPredicate *predicate     = [NSPredicate predicateWithFormat:@"name CONTAINS[c] %@",searchString];
@@ -73,7 +81,8 @@ NSTextView *findAndFocusFirstTextViewIn(NSView *view) {
 		// The tableview datasource methods expect an OakBundleItem so here we have to convert all our
 		// matches and then add them to the results
 		unsigned int languageCount = [matchedLangauges count];
-		for (unsigned int index = 0; index < languageCount; index += 1) {
+		for(unsigned int index = 0; index < languageCount; index += 1)
+		{
 			NSDictionary *languageDictionary = [matchedLangauges objectAtIndex:index];
 			id language = [[NSClassFromString(@"BundleManager") sharedInstance] bundleItemForUUID:[languageDictionary objectForKey:@"uuid"]];
 			// Add the language to the top of the list, as our search method is more basic than the standard one
@@ -90,7 +99,8 @@ NSTextView *findAndFocusFirstTextViewIn(NSView *view) {
 // Fortunately the OakBundleEditor has a method for just that :)
 - (void)swizzledAccept:(id)sender
 {
-	if ([self isInBundleEditor]) {
+	if([self isInBundleEditor])
+	{
 		NSTableColumn *bundleItemsTableColumn = [self valueForKey:@"bundleItemsTableColumn"];
 		int selectedRow                       = [[[bundleItemsTableColumn tableView] selectedRowIndexes] firstIndex];
 		id selectedBundleItem                 = [[self valueForKey:@"bundleItems"] objectAtIndex:selectedRow];
@@ -113,7 +123,7 @@ NSTextView *findAndFocusFirstTextViewIn(NSView *view) {
 - (int)selectedRowIndex
 {
 	int rowNumber = [self rowAtPoint:[self convertPoint:[[NSApp currentEvent] locationInWindow] fromView:nil]];
-	if (rowNumber == -1)
+	if(rowNumber == -1)
 		rowNumber = [self selectedRow];
 
 	return rowNumber;
@@ -136,13 +146,16 @@ NSTextView *findAndFocusFirstTextViewIn(NSView *view) {
 	NSString *path = [sender title];
 
 	NSString *source;
-	if ([path hasSuffix:@".tmbundle"]) {
+	if([path hasSuffix:@".tmbundle"])
+	{
 		source = @"tell app \"Terminal\"\n"
 				 @"	activate\n"
 				 @"	do script with command \"ITEM_PATH='%@'\"\n"
 				 @"	do script with command \"cd \\\"$ITEM_PATH\\\"\" in front window\n"
 				 @"end tell";
-	} else {
+	}
+	else
+	{
 		source = @"tell app \"Terminal\"\n"
 				 @"	activate\n"
 				 @"	do script with command \"ITEM_PATH='%@'\"\n"
@@ -164,26 +177,31 @@ NSTextView *findAndFocusFirstTextViewIn(NSView *view) {
 {
 	// Remove all items
 	int itemCount = [menu numberOfItems];
-	for (int index = 0; index < itemCount; index++)
+	for(int index = 0; index < itemCount; index++)
 		[menu removeItemAtIndex:0];
 	
 	id item = [self BundleEditorSearch_selectedItem];
 	NSArray *paths = nil;
 
-	if ([item respondsToSelector:@selector(bundlePaths)]) {
+	if([item respondsToSelector:@selector(bundlePaths)])
+	{
 		paths = [item bundlePaths];
-	} else if ([item respondsToSelector:@selector(sourcePaths)]) {
+	}
+	else if([item respondsToSelector:@selector(sourcePaths)])
+	{
 		paths = [item sourcePaths];
 	}
 
-	if (paths) {
+	if(paths)
+	{
 		unsigned int pathCount = [paths count];
 
-		for (unsigned int index = 0; index < pathCount; index += 1) {
+		for(unsigned int index = 0; index < pathCount; index += 1)
+		{
 			NSString *path = [paths objectAtIndex:index];
 			NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:path action:@selector(revealPathInFinder:) keyEquivalent:@""];
 			{
-				if ([[menu title] isEqualToString:@"Terminal"])
+				if([[menu title] isEqualToString:@"Terminal"])
 					[menuItem setAction:@selector(revealPathInTerminal:)];
 				[menu addItem:menuItem];
 			}
@@ -197,7 +215,7 @@ NSTextView *findAndFocusFirstTextViewIn(NSView *view) {
 // =========
 - (void)awakeFromNib
 {
-	if (! [NSStringFromClass([self class]) isEqualToString:@"OakBundleOutlineView"])
+	if(! [NSStringFromClass([self class]) isEqualToString:@"OakBundleOutlineView"])
 		return;
 
 	NSMenu *menu = [[NSMenu alloc] init];
