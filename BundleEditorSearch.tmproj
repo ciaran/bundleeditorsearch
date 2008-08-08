@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>MethodSwizzle.m</string>
+	<string>BundleEditorSearch.h</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -28,7 +28,7 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>3</integer>
+				<integer>19</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -42,12 +42,12 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>96</integer>
+				<integer>173</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>72</integer>
+			<integer>150</integer>
 		</dict>
 		<key>MethodSwizzle.h</key>
 		<dict>
@@ -87,6 +87,18 @@
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<false/>
+	<key>showFileHierarchyPanel</key>
+	<false/>
+	<key>treeState</key>
+	<dict>
+		<key>BundleEditorPlus</key>
+		<dict>
+			<key>isExpanded</key>
+			<true/>
+			<key>subItems</key>
+			<dict/>
+		</dict>
+	</dict>
 	<key>windowFrame</key>
 	<string>{{0, 4}, {1440, 874}}</string>
 </dict>

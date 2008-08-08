@@ -39,17 +39,15 @@ NSTextView *findAndFocusFirstTextViewIn(NSView *view) {
 - (void)swizzledShowKeyEquivalent:(NSEvent *)keyEquivalent withResults:(NSArray *)results
 {
 	if ([self isInBundleEditor]) {
-		OakSelectBundleItem *controller = (OakSelectBundleItem*)self;
 		// First we call the standard method to display the key equivalent in the search field
 		// Because the scope filter is empty, this method will only show bundle items
 		// which are completely unscoped
 		[self swizzledShowKeyEquivalent:keyEquivalent withResults:results];
-		[controller->bundleItems release];
 		// The results we receive are an array of all the items matching the key equivalent
 		// so we can simply replace the internal array of matches with this array,
 		// and tell the tableview to reload itself
-		controller->bundleItems = [results retain];
-		[[controller->bundleItemsTableColumn tableView] reloadData];
+		[self setValue:results forKey:@"bundleItems"];
+		[[[self valueForKey:@"bundleItemsTableColumn"] tableView] reloadData];
 	} else {
 		[self swizzledShowKeyEquivalent:keyEquivalent withResults:results];
 	}
@@ -59,9 +57,8 @@ NSTextView *findAndFocusFirstTextViewIn(NSView *view) {
 // Here we do a basic search for languages matching the search and add them to the results
 - (void)swizzledSearch:(id)search
 {
-	OakSelectBundleItem *controller = (OakSelectBundleItem*)self;
 	NSString *searchString          = [search stringValue];
-	BOOL isNewSearch                = ![searchString isEqualToString:controller->filterString];
+	BOOL isNewSearch                = ![searchString isEqualToString:[self valueForKey:@"filterString"]];
 
 	// Call the standard method to get the normal results
 	[self swizzledSearch:search];
@@ -71,8 +68,7 @@ NSTextView *findAndFocusFirstTextViewIn(NSView *view) {
 		NSArray *languages         = [[NSClassFromString(@"BundleManager") sharedInstance] languages];
 		NSPredicate *predicate     = [NSPredicate predicateWithFormat:@"name CONTAINS[c] %@",searchString];
 		NSArray *matchedLangauges  = [languages filteredArrayUsingPredicate:predicate];
-		NSMutableArray *newMatches = [controller->bundleItems mutableCopy]; // newMatches will be our result array
-		[controller->bundleItems release]; // Destroy the old array as we don’t need it any more
+		NSMutableArray *newMatches = [[self valueForKey:@"bundleItems"] mutableCopy]; // newMatches will be our result array
 
 		// The tableview datasource methods expect an OakBundleItem so here we have to convert all our
 		// matches and then add them to the results
@@ -84,8 +80,8 @@ NSTextView *findAndFocusFirstTextViewIn(NSView *view) {
 			// and language names are likely to be an explicit query
 			[newMatches insertObject:language atIndex:0];
 		}
-		controller->bundleItems = newMatches;
-		[[controller->bundleItemsTableColumn tableView] reloadData];
+		[self setValue:newMatches forKey:@"bundleItems"];
+		[[[self valueForKey:@"bundleItemsTableColumn"] tableView] reloadData];
 	}
 }
 
@@ -95,16 +91,15 @@ NSTextView *findAndFocusFirstTextViewIn(NSView *view) {
 - (void)swizzledAccept:(id)sender
 {
 	if ([self isInBundleEditor]) {
-		OakSelectBundleItem *controller = [[sender window] delegate];
-		NSTableColumn *bundleItemsTableColumn = controller->bundleItemsTableColumn;
-		int selectedRow = [[[bundleItemsTableColumn tableView] selectedRowIndexes] firstIndex];
-		id selectedBundleItem = [controller->bundleItems objectAtIndex:selectedRow];
+		NSTableColumn *bundleItemsTableColumn = [self valueForKey:@"bundleItemsTableColumn"];
+		int selectedRow                       = [[[bundleItemsTableColumn tableView] selectedRowIndexes] firstIndex];
+		id selectedBundleItem                 = [[self valueForKey:@"bundleItems"] objectAtIndex:selectedRow];
 		
-		OakBundleEditor *bundleEditor = [NSClassFromString(@"OakBundleEditor") sharedInstance];
+		id bundleEditor = [NSClassFromString(@"OakBundleEditor") sharedInstance];
 		[bundleEditor showItem:selectedBundleItem];
 		
 		// Focus the relevant editor view
-		NSTextView *textView = findAndFocusFirstTextViewIn(bundleEditor->editorBox);
+		NSTextView *textView = findAndFocusFirstTextViewIn([bundleEditor valueForKey:@"editorBox"]);
 		// By default the selection will be at the end of the text, so move it to the top
 		[textView setSelectedRange:NSMakeRange(0, 0)];
 	}
